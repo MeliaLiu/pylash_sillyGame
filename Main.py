@@ -9,12 +9,12 @@ import os
 
 def main():
     loadList = []
-    for root, dirs, files in os.walk("./src/images/"):
+    for root, dirs, files in os.walk("./res/images/"):
         for filename in files:
             if filename.split(".")[1] == "png":
                 loadList.append({"name":filename.split(".")[0], "path": root+filename})
 
-    for root, dirs, files in os.walk("./src/"):
+    for root, dirs, files in os.walk("./res/"):
         for filename in files:
             if filename.split(".")[1] == "wav":
                 loadList.append({"name":filename.split(".")[0], "path": root+filename})
