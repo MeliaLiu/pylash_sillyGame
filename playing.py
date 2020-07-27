@@ -146,6 +146,8 @@ class snake(Sprite):
                     nextHeadCol = self.items[0]["col"] + 1
             else:
                 gameBoard[int(self.items[i]["row"])][int(self.items[i]["col"])] = self.snakeKind
+            self.items[0]["item"].remove()
+            playingLayer.addChild(self.items[0]["item"])
         
         # add newly grown bodies
         for newbody in newBodies:
@@ -462,7 +464,6 @@ def gameOver(overKind, overInfo):
     newHead.x = lastHead.x
     newHead.y = lastHead.y
     playingLayer.addChild(newHead)
-
 
     # display the faces
     p1Face = TextField()
