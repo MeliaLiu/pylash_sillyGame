@@ -41,6 +41,7 @@ class snake(Sprite):
         self.items[0]["item"].visible = True
         playingLayer.addChild(self.items[0]["item"])
 
+        global gameBoard
         if (startX/10-1 >= 0) and (startY/10-13 >= 0):
             gameBoard[int(startY/10-13)][int(startX/10-1)] = "head"
 
@@ -56,8 +57,14 @@ class snake(Sprite):
         elif self.direction == "Right":
             for i in range(5):
                 self.addBody(self.startY, self.startX+(-1-i)*10)
+        for i in gameBoard:
+            for j in i:
+                if j == "snake1":
+                    boo = True
+        print("snake init:", boo)
 
     def addBody(self, y, x):
+        # global gameBoard
         item = Bitmap(BitmapData(dataList[self.snakeKind+"Body"]))
         item.x = x
         item.y = y
@@ -67,6 +74,8 @@ class snake(Sprite):
             gameBoard[int(y/10-13)][int(x/10-1)] = self.snakeKind
     
     def move(self):
+        # global gameBoard
+
         # head style
         lastHead = self.items[0]["item"]
         lastHead.visible = False
@@ -130,6 +139,9 @@ class snake(Sprite):
             if (i == 0):
                 if (int(self.items[i]["row"]) < 0 or int(self.items[i]["row"]) > 49) or (int(self.items[i]["col"]) < 0 or int(self.items[i]["col"]) > 49):
                     print("speed:", self.speed)
+                    print("direction:", self.direction)
+                    print("overKind: \n", debugOverKind)
+                    print("overInfo: \n", debugOverInfo)
                     print("row and col:", self.items[i]["row"], self.items[i]["col"])
                 gameBoard[int(self.items[i]["row"])][int(self.items[i]["col"])] = "head"
                 if self.direction == "Up":
@@ -239,9 +251,31 @@ def gameStart(data, bgmPlay, effectsPlay, p1Profile, p2Profile):
     stage.addEventListener(KeyboardEvent.KEY_UP, keyUp)
     playingLayer.addEventListener(LoopEvent.ENTER_FRAME, loop)
 
-    generate(0.05)
+    boo = False
+    for i in gameBoard:
+        for j in i:
+            if j == "snake1":
+                boo = True
+    print("before generate:", boo)
+    generate(0.05, 0)
+    for i in gameBoard:
+        for j in i:
+            if j == "snake1":
+                boo = True
+    print("after generate:", boo)
 
 def keyDown(e):
+    # if e.keyCode == KeyCode.KEY_SPACE:
+        # while (True):
+        #     mode = input("index = 0 or output the gameBoard = 1\n")
+        #     if mode == "0":
+        #         row = input("row")
+        #         col = input("col")
+        #         print(gameBoard[row][col])
+        #     else:
+        #         for i in range(len(gameBoard)):
+        #             print('------------- row:', i)
+        #             print(gameBoard[i])
     if e.keyCode == KeyCode.KEY_W:
         snake1.direction = "Up"
         snake1.speed = 3
@@ -284,9 +318,9 @@ def keyUp(e):
         moveEffect.stop()
 
 def loop(e):
-    minRatio = 0.03
+    minRatio = 0.045
     while (len(candies)/(2500-len(snake1.items)-len(snake2.items)) < minRatio):
-        generate(0.05)
+        generate(0.05, 1)
 
     if gameContinue:
         snakeLoop(snake1, snake2)
@@ -392,22 +426,36 @@ def snakeLoop(s1, s2):
     elif snakeCollision:
         gameOver(records[-1][0], records[-1][-1])
     
-def generate(ratio):
-    global candies
+def generate(ratio, candyKind):
+    global candies, gameBoard
+
+    boo = False 
+    for i in gameBoard:
+        for j in i:
+            if j == "snake1":
+                boo = True
+    print("directly before really generate:", boo)
+
     while (len(candies)/(2500-len(snake1.items)-len(snake2.items)) < ratio):
         row = random.randint(0, 49)
         col = random.randint(0, 49)
 
         if (gameBoard[row][col] == None):
             gameBoard[row][col] = "candy"
-            candyKind = random.randint(0,3)
+            # candyKind = random.randint(0,3)
             newCandy = Bitmap(BitmapData(dataList["candy%s" % candyKind]))
             newCandy.x = 10 + col*10
             newCandy.y = 130 + row*10
             playingLayer.addChild(newCandy)
             candies[str(row)+"_"+str(col)] = newCandy
 
+
+
 def gameOver(overKind, overInfo):
+    global debugOverKind, debugOverInfo
+    debugOverKind = overKind
+    debugOverInfo = overInfo
+
     if effectsOn:
         gameOverEffect.play()
     global gameContinue
